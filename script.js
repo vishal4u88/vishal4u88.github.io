@@ -1,444 +1,526 @@
-/* ========================================
-   SCRIPT.JS - Complete Portfolio Functionality
-   ======================================== */
-
-// ========================================
-// 1. LOADER
-// ========================================
 document.addEventListener('DOMContentLoaded', () => {
-    const loader = document.getElementById('loader');
-    if (loader) {
-        setTimeout(() => {
-            loader.classList.add('hidden');
-        }, 500);
-    }
-    
-    initTypingEffect();
-    initScrollReveal();
-    initCounterAnimation();
-    initParticles();
-    initMouseGlow();
-    initNavbarScroll();
-    initGitHubAPI();
-    initContactForm();
-    initBackToTop();
-    initYearUpdate();
-    initProjectCards();
-    initThemeToggle();
-    animateSkillBars();
-    initTiltCards();
+  const loader = document.getElementById('loader');
+  if (loader) {
+    setTimeout(() => loader.classList.add('hidden'), 500);
+  }
+  initCustomCursor();
+  initGridCanvas();
+  initTypingEffect();
+  initScrollReveal();
+  initCounterAnimation();
+  initParticles();
+  initMouseGlow();
+  initNavbarScroll();
+  initGitHubAPI();
+  initContactForm();
+  initBackToTop();
+  initYearUpdate();
+  initProjectCards();
+  initThemeToggle();
+  animateSkillBars();
+  initTiltCards();
+  initMobileMenu();
 });
 
-// ========================================
-// 2. TYPING EFFECT
-// ========================================
+function initCustomCursor() {
+  if (window.innerWidth <= 768) return;
+  const cursor = document.createElement('div');
+  cursor.id = 'customCursor';
+  cursor.innerHTML = '<div class="cursor-dot"></div><div class="cursor-ring"></div>';
+  document.body.appendChild(cursor);
+  let mx = 0, my = 0, cx = 0, cy = 0;
+  let active = false;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX;
+    my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+  document.querySelectorAll('a, button, input, textarea, .tilt-card, .stat-card, .cert-card, .project-card').forEach(el => {
+    el.addEventListener('mouseenter', () => { active = true; cursor.classList.add('active'); });
+    el.addEventListener('mouseleave', () => { active = false; cursor.classList.remove('active'); });
+  });
+  document.addEventListener('mouseleave', () => cursor.style.display = 'none');
+  document.addEventListener('mouseenter', () => cursor.style.display = 'block');
+}
+
+function initGridCanvas() {
+  const canvas = document.createElement('canvas');
+  canvas.id = 'gridCanvas';
+  document.body.prepend(canvas);
+  const ctx = canvas.getContext('2d');
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  const spacing = 60;
+  const dots = [];
+  const mouse = { x: -1000, y: -1000 };
+  document.addEventListener('mousemove', e => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+  for (let x = 0; x < canvas.width + spacing; x += spacing) {
+    for (let y = 0; y < canvas.height + spacing; y += spacing) {
+      dots.push({ x, y, ox: x, oy: y, vx: 0, vy: 0 });
+    }
+  }
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#00f0ff';
+    dots.forEach(d => {
+      const dx = d.ox - mouse.x;
+      const dy = d.oy - mouse.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        const force = (120 - dist) / 120 * 2;
+        const angle = Math.atan2(dy, dx);
+        d.vx += Math.cos(angle) * force;
+        d.vy += Math.sin(angle) * force;
+      }
+      d.vx *= 0.85;
+      d.vy *= 0.85;
+      d.x += d.vx;
+      d.y += d.vy;
+      const tx = (d.x - d.ox) * 0.05;
+      const ty = (d.y - d.oy) * 0.05;
+      d.x -= tx;
+      d.y -= ty;
+      ctx.fillStyle = gridColor;
+      ctx.globalAlpha = 0.2 + (Math.sin((d.x + d.y) * 0.01 + Date.now() * 0.0005) * 0.05);
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+
 function initTypingEffect() {
-    const typingElement = document.getElementById('typingText');
-    if (!typingElement) return;
-    
-    const titles = [
-        'Technical Support Engineer',
-        'AI Automation Engineer',
-        'Chrome Extension Developer',
-        'Python Developer',
-        'LLM Engineer',
-        'Data Analytics Enthusiast'
-    ];
-    
-    let titleIndex = 0;
-    let charIndex = 0;
-    let isDeleting = false;
-    
-    function typeEffect() {
-        const currentTitle = titles[titleIndex];
-        
-        if (isDeleting) {
-            typingElement.textContent = currentTitle.substring(0, charIndex - 1);
-            charIndex--;
-            if (charIndex === 0) {
-                isDeleting = false;
-                titleIndex = (titleIndex + 1) % titles.length;
-                setTimeout(typeEffect, 500);
-                return;
-            }
-            setTimeout(typeEffect, 30);
-        } else {
-            typingElement.textContent = currentTitle.substring(0, charIndex + 1);
-            charIndex++;
-            if (charIndex === currentTitle.length) {
-                isDeleting = true;
-                setTimeout(typeEffect, 2000);
-                return;
-            }
-            setTimeout(typeEffect, 50);
-        }
+  const el = document.getElementById('typingText');
+  if (!el) return;
+  const titles = [
+    'Technical Support Engineer',
+    'AI Automation Engineer',
+    'Chrome Extension Developer',
+    'Python Developer',
+    'LLM Engineer',
+    'Data Analytics Enthusiast'
+  ];
+  let ti = 0, ci = 0, del = false;
+  function type() {
+    const cur = titles[ti];
+    if (del) {
+      el.textContent = cur.substring(0, ci - 1);
+      ci--;
+      if (ci === 0) { del = false; ti = (ti + 1) % titles.length; setTimeout(type, 500); return; }
+      setTimeout(type, 25);
+    } else {
+      el.textContent = cur.substring(0, ci + 1);
+      ci++;
+      if (ci === cur.length) { del = true; setTimeout(type, 2000); return; }
+      setTimeout(type, 45);
     }
-    
-    setTimeout(typeEffect, 500);
+  }
+  setTimeout(type, 500);
 }
 
-// ========================================
-// 3. SCROLL REVEAL
-// ========================================
 function initScrollReveal() {
-    const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, {
-        threshold: 0.15,
-        rootMargin: '0px 0px -50px 0px'
-    });
-    
-    revealElements.forEach(el => observer.observe(el));
+  const els = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+  els.forEach(el => obs.observe(el));
 }
 
-// ========================================
-// 4. COUNTER ANIMATION
-// ========================================
 function initCounterAnimation() {
-    const counters = [
-        { id: 'counterYears', target: 3, suffix: '+' },
-        { id: 'counterPromotions', target: 3, suffix: '' },
-        { id: 'counterReduction', target: 70, suffix: '%+' },
-        { id: 'counterGlobal', target: 3, suffix: '' }
-    ];
-    
-    counters.forEach(counter => {
-        const element = document.getElementById(counter.id);
-        if (!element) return;
-        element.dataset.target = counter.target;
-        element.dataset.suffix = counter.suffix || '';
-        element.textContent = '0' + counter.suffix;
+  const counters = [
+    { id: 'counterYears', target: 3, suffix: '+' },
+    { id: 'counterPromotions', target: 3, suffix: '' },
+    { id: 'counterReduction', target: 70, suffix: '%+' },
+    { id: 'counterGlobal', target: 3, suffix: '' }
+  ];
+  counters.forEach(c => {
+    const el = document.getElementById(c.id);
+    if (!el) return;
+    el.dataset.target = c.target;
+    el.dataset.suffix = c.suffix || '';
+    el.textContent = '0' + c.suffix;
+  });
+  const statCards = document.querySelectorAll('.stat-card');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !e.target.dataset.animated) {
+        e.target.dataset.animated = 'true';
+        const numEl = e.target.querySelector('.stat-number span');
+        if (!numEl) return;
+        const target = parseInt(numEl.dataset.target) || 0;
+        const suffix = numEl.dataset.suffix || '';
+        let cur = 0;
+        const dur = 1500;
+        const start = performance.now();
+        function tick(time) {
+          const p = Math.min((time - start) / dur, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          cur = Math.floor(eased * target);
+          numEl.textContent = cur + suffix;
+          if (p < 1) requestAnimationFrame(tick);
+          else numEl.textContent = target + suffix;
+        }
+        requestAnimationFrame(tick);
+      }
     });
+  }, { threshold: 0.3 });
+  statCards.forEach(card => obs.observe(card));
 }
 
-// ========================================
-// 5. PARTICLES
-// ========================================
 function initParticles() {
-    const canvas = document.getElementById('particlesCanvas');
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    let mouseX = 0;
-    let mouseY = 0;
-    let isMouseNear = false;
-    
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+  const canvas = document.getElementById('particlesCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let mouseX = 0, mouseY = 0, isNear = false;
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 2 + 0.5;
+      this.sx = (Math.random() - 0.5) * 0.4;
+      this.sy = (Math.random() - 0.5) * 0.4;
+      this.op = Math.random() * 0.4 + 0.1;
     }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    
-    class Particle {
-        constructor() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 2 + 0.5;
-            this.speedX = (Math.random() - 0.5) * 0.5;
-            this.speedY = (Math.random() - 0.5) * 0.5;
-            this.opacity = Math.random() * 0.5 + 0.2;
+    update() {
+      this.x += this.sx;
+      this.y += this.sy;
+      if (this.x < 0) this.x = canvas.width;
+      if (this.x > canvas.width) this.x = 0;
+      if (this.y < 0) this.y = canvas.height;
+      if (this.y > canvas.height) this.y = 0;
+      if (isNear) {
+        const dx = this.x - mouseX;
+        const dy = this.y - mouseY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 150) {
+          const f = (150 - dist) / 150 * 0.8;
+          this.x += (dx / dist) * f;
+          this.y += (dy / dist) * f;
         }
-        update() {
-            this.x += this.speedX;
-            this.y += this.speedY;
-            if (this.x < 0) this.x = canvas.width;
-            if (this.x > canvas.width) this.x = 0;
-            if (this.y < 0) this.y = canvas.height;
-            if (this.y > canvas.height) this.y = 0;
-            if (isMouseNear) {
-                const dx = this.x - mouseX;
-                const dy = this.y - mouseY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance < 150) {
-                    const force = (150 - distance) / 150 * 0.5;
-                    this.x += (dx / distance) * force;
-                    this.y += (dy / distance) * force;
-                }
-            }
+      }
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#00f0ff';
+      ctx.fillStyle = gridColor;
+      ctx.globalAlpha = this.op;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
+  const count = Math.min(60, Math.floor(window.innerWidth / 20));
+  for (let i = 0; i < count; i++) particles.push(new Particle());
+  function drawConnections() {
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          const op = (1 - dist / 120) * 0.1;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#00f0ff';
+          ctx.strokeStyle = gridColor;
+          ctx.globalAlpha = op;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+          ctx.globalAlpha = 1;
         }
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(108, 92, 231, ${this.opacity})`;
-            ctx.fill();
-        }
+      }
     }
-    
-    const particleCount = Math.min(80, Math.floor(window.innerWidth / 15));
-    for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle());
-    }
-    
-    function drawConnections() {
-        for (let i = 0; i < particles.length; i++) {
-            for (let j = i + 1; j < particles.length; j++) {
-                const dx = particles[i].x - particles[j].x;
-                const dy = particles[i].y - particles[j].y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance < 150) {
-                    const opacity = (1 - distance / 150) * 0.15;
-                    ctx.beginPath();
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(particles[j].x, particles[j].y);
-                    ctx.strokeStyle = `rgba(108, 92, 231, ${opacity})`;
-                    ctx.lineWidth = 0.5;
-                    ctx.stroke();
-                }
-            }
-        }
-    }
-    
-    function animateParticles() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => { p.update(); p.draw(); });
-        drawConnections();
-        requestAnimationFrame(animateParticles);
-    }
-    animateParticles();
-    
-    canvas.addEventListener('mousemove', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        mouseX = e.clientX - rect.left;
-        mouseY = e.clientY - rect.top;
-        isMouseNear = true;
-    });
-    canvas.addEventListener('mouseleave', () => { isMouseNear = false; });
+  }
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    drawConnections();
+    requestAnimationFrame(animate);
+  }
+  animate();
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouseX = e.clientX - r.left;
+    mouseY = e.clientY - r.top;
+    isNear = true;
+  });
+  canvas.addEventListener('mouseleave', () => { isNear = false; });
 }
 
-// ========================================
-// 6. MOUSE GLOW
-// ========================================
 function initMouseGlow() {
-    const glow = document.getElementById('mouseGlow');
-    if (!glow) return;
-    let visible = false;
-    document.addEventListener('mousemove', (e) => {
-        glow.style.left = e.clientX + 'px';
-        glow.style.top = e.clientY + 'px';
-        if (!visible) { glow.style.display = 'block'; visible = true; }
-    });
-    document.addEventListener('mouseleave', () => {
-        glow.style.display = 'none';
-        visible = false;
-    });
+  const glow = document.getElementById('mouseGlow');
+  if (!glow) return;
+  let vis = false;
+  document.addEventListener('mousemove', e => {
+    glow.style.left = e.clientX + 'px';
+    glow.style.top = e.clientY + 'px';
+    if (!vis) { glow.style.display = 'block'; vis = true; }
+  });
+  document.addEventListener('mouseleave', () => { glow.style.display = 'none'; vis = false; });
 }
 
-// ========================================
-// 7. NAVBAR SCROLL
-// ========================================
 function initNavbarScroll() {
-    const navbar = document.getElementById('navbar');
-    if (!navbar) return;
-    window.addEventListener('scroll', () => {
-        navbar.classList.toggle('scrolled', window.pageYOffset > 50);
-    });
+  const navbar = document.getElementById('navbar');
+  if (!navbar) return;
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.pageYOffset > 50);
+  });
 }
 
-// ========================================
-// 8. GITHUB API
-// ========================================
 async function initGitHubAPI() {
-    const username = 'vishal4u88';
-    const reposList = document.getElementById('githubReposList');
-    const followersEl = document.getElementById('githubFollowers');
-    const reposEl = document.getElementById('githubRepos');
-    const starsEl = document.getElementById('githubStars');
-    const avatarImg = document.querySelector('#githubAvatar img');
-    if (!reposList) return;
-    
-    try {
-        const userRes = await fetch(`https://api.github.com/users/${username}`);
-        if (!userRes.ok) throw new Error('User not found');
-        const userData = await userRes.json();
-        if (avatarImg) avatarImg.src = userData.avatar_url;
-        if (followersEl) followersEl.textContent = userData.followers || 0;
-        if (reposEl) reposEl.textContent = userData.public_repos || 0;
-        
-        const reposRes = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=6`);
-        if (!reposRes.ok) throw new Error('Repos not found');
-        const repos = await reposRes.json();
-        const totalStars = repos.reduce((sum, r) => sum + r.stargazers_count, 0);
-        if (starsEl) starsEl.textContent = totalStars;
-        
-        reposList.innerHTML = '';
-        if (repos.length === 0) {
-            reposList.innerHTML = '<p style="color:#606078;font-size:0.9rem;">No repositories found.</p>';
-            return;
-        }
-        repos.forEach(repo => {
-            const item = document.createElement('div');
-            item.className = 'github-repo-item';
-            const color = getLanguageColor(repo.language);
-            item.innerHTML = `
-                <a href="${repo.html_url}" target="_blank" class="repo-name">${repo.name}</a>
-                <div class="repo-meta">
-                    ${repo.language ? `<span class="lang-dot" style="background:${color};"></span> ${repo.language}` : ''}
-                    <span>⭐ ${repo.stargazers_count}</span>
-                    <span>🍴 ${repo.forks_count}</span>
-                </div>
-            `;
-            reposList.appendChild(item);
-        });
-    } catch (error) {
-        console.error('GitHub API Error:', error);
-        reposList.innerHTML = '<p style="color:#606078;font-size:0.9rem;">⚠️ Unable to load repositories.</p>';
+  const username = 'vishal4u88';
+  const reposList = document.getElementById('githubReposList');
+  const followersEl = document.getElementById('githubFollowers');
+  const reposEl = document.getElementById('githubRepos');
+  const starsEl = document.getElementById('githubStars');
+  const avatarImg = document.querySelector('#githubAvatar img');
+  if (!reposList) return;
+  try {
+    const [userRes, reposRes] = await Promise.all([
+      fetch(`https://api.github.com/users/${username}`),
+      fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=6&type=public`)
+    ]);
+    if (!userRes.ok) throw new Error('User fetch failed');
+    if (!reposRes.ok) throw new Error('Repos fetch failed');
+    const [userData, repos] = await Promise.all([userRes.json(), reposRes.json()]);
+    if (avatarImg) {
+      avatarImg.src = userData.avatar_url;
+      avatarImg.alt = `${userData.login} GitHub avatar`;
     }
+    if (followersEl) followersEl.textContent = userData.followers ?? 0;
+    if (reposEl) reposEl.textContent = userData.public_repos ?? 0;
+    const totalStars = repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0);
+    if (starsEl) starsEl.textContent = totalStars;
+    reposList.innerHTML = '';
+    if (repos.length === 0) {
+      reposList.innerHTML = '<p style="color:#555570;font-size:0.85rem;font-family:var(--font-mono);">No repositories found.</p>';
+      return;
+    }
+    repos.forEach(repo => {
+      const item = document.createElement('div');
+      item.className = 'github-repo-item';
+      const color = getLanguageColor(repo.language);
+      item.innerHTML = `
+        <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="repo-name">${repo.name}</a>
+        <div class="repo-meta">
+          ${repo.language ? `<span class="lang-dot" style="background:${color};color:${color};"></span> ${repo.language}` : ''}
+          <span>★ ${repo.stargazers_count}</span>
+          <span>⑂ ${repo.forks_count}</span>
+        </div>
+      `;
+      reposList.appendChild(item);
+    });
+  } catch (error) {
+    console.error('GitHub API Error:', error);
+    reposList.innerHTML = '<p style="color:#ff3355;font-size:0.85rem;font-family:var(--font-mono);">⚠ Unable to load repositories. Please try again later.</p>';
+  }
 }
 
 function getLanguageColor(lang) {
-    const colors = {
-        'JavaScript': '#f1e05a', 'Python': '#3572A5', 'HTML': '#e34c26',
-        'CSS': '#563d7c', 'TypeScript': '#2b7489', 'Java': '#b07219',
-        'C++': '#f34b7d', 'C#': '#178600', 'Ruby': '#701516',
-        'Go': '#00ADD8', 'Rust': '#dea584', 'Swift': '#ffac45',
-        'PHP': '#4F5D95', 'Vue': '#2c3e50', 'Shell': '#89e051', 'SQL': '#e38c00'
-    };
-    return colors[lang] || '#808080';
+  const colors = {
+    'JavaScript': '#f1e05a', 'Python': '#3572A5', 'HTML': '#e34c26',
+    'CSS': '#563d7c', 'TypeScript': '#3178c6', 'Java': '#b07219',
+    'C++': '#f34b7d', 'C#': '#178600', 'Ruby': '#701516',
+    'Go': '#00ADD8', 'Rust': '#dea584', 'Swift': '#ffac45',
+    'PHP': '#4F5D95', 'Vue': '#42b883', 'Shell': '#89e051', 'SQL': '#e38c00',
+    'Kotlin': '#A97BFF', 'Dart': '#00B4AB', 'Scala': '#c22d40',
+    'Jupyter Notebook': '#DA5B0B'
+  };
+  return colors[lang] || '#808080';
 }
 
-// ========================================
-// 9. CONTACT FORM
-// ========================================
 function initContactForm() {
-    const form = document.getElementById('contactForm');
-    if (!form) return;
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const name = document.getElementById('contactName').value.trim();
-        const email = document.getElementById('contactEmail').value.trim();
-        const message = document.getElementById('contactMessage').value.trim();
-        if (!name || !email || !message) { alert('Please fill in all fields.'); return; }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Please enter a valid email.'); return; }
-        const subject = encodeURIComponent(`Portfolio Contact from ${name}`);
-        const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
-        window.location.href = `mailto:vishal4u88@gmail.com?subject=${subject}&body=${body}`;
-        const btn = form.querySelector('.btn-primary');
-        const original = btn.textContent;
-        btn.textContent = '✅ Message Sent!';
-        btn.style.background = 'linear-gradient(135deg, #00b894, #00cec9)';
-        setTimeout(() => { btn.textContent = original; btn.style.background = ''; form.reset(); }, 3000);
-    });
+  const form = document.getElementById('contactForm');
+  if (!form) return;
+  const nameInput = document.getElementById('contactName');
+  const emailInput = document.getElementById('contactEmail');
+  const messageInput = document.getElementById('contactMessage');
+  const nameError = document.getElementById('nameError');
+  const emailError = document.getElementById('emailError');
+  const messageError = document.getElementById('messageError');
+  const submitBtn = form.querySelector('.submit-btn');
+  function validateField(input, errorEl, validator) {
+    const val = input.value.trim();
+    if (!val) {
+      input.classList.remove('valid');
+      input.classList.add('error');
+      if (errorEl) errorEl.classList.add('visible');
+      return false;
+    }
+    if (validator && !validator(val)) {
+      input.classList.remove('valid');
+      input.classList.add('error');
+      if (errorEl) errorEl.classList.add('visible');
+      return false;
+    }
+    input.classList.remove('error');
+    input.classList.add('valid');
+    if (errorEl) errorEl.classList.remove('visible');
+    return true;
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  function validateAll() {
+    const validName = validateField(nameInput, nameError);
+    const validEmail = validateField(emailInput, emailError, v => emailRegex.test(v));
+    const validMessage = validateField(messageInput, messageError, v => v.length >= 10);
+    return validName && validEmail && validMessage;
+  }
+  nameInput.addEventListener('blur', () => validateField(nameInput, nameError));
+  nameInput.addEventListener('input', () => { if (nameInput.value.trim()) validateField(nameInput, nameError); });
+  emailInput.addEventListener('blur', () => validateField(emailInput, emailError, v => emailRegex.test(v)));
+  emailInput.addEventListener('input', () => { if (emailRegex.test(emailInput.value.trim())) validateField(emailInput, emailError, v => emailRegex.test(v)); });
+  messageInput.addEventListener('blur', () => validateField(messageInput, messageError, v => v.length >= 10));
+  messageInput.addEventListener('input', () => { if (messageInput.value.trim().length >= 10) validateField(messageInput, messageError, v => v.length >= 10); });
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validateAll()) return;
+    submitBtn.disabled = true;
+    submitBtn.classList.add('loading');
+    const originalHtml = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="btn-loader"><span></span><span></span><span></span></span>';
+    const subject = encodeURIComponent(`Portfolio Contact from ${nameInput.value.trim()}`);
+    const body = encodeURIComponent(
+      `Name: ${nameInput.value.trim()}\nEmail: ${emailInput.value.trim()}\n\nMessage:\n${messageInput.value.trim()}`
+    );
+    await new Promise(r => setTimeout(r, 600));
+    window.location.href = `mailto:vishal4u88@gmail.com?subject=${subject}&body=${body}`;
+    submitBtn.innerHTML = '✅ Message Sent!';
+    submitBtn.style.background = 'linear-gradient(135deg, #00e676, #00bcd4)';
+    submitBtn.disabled = false;
+    submitBtn.classList.remove('loading');
+    setTimeout(() => {
+      submitBtn.innerHTML = originalHtml;
+      submitBtn.style.background = '';
+      form.reset();
+      [nameInput, emailInput, messageInput].forEach(i => i.classList.remove('valid', 'error'));
+      [nameError, emailError, messageError].forEach(e => { if (e) e.classList.remove('visible'); });
+    }, 3000);
+  });
 }
 
-// ========================================
-// 10. BACK TO TOP
-// ========================================
 function initBackToTop() {
-    const btn = document.getElementById('backToTop');
-    if (!btn) return;
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+  const btn = document.getElementById('backToTop');
+  if (!btn) return;
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 }
 
-// ========================================
-// 11. YEAR UPDATE
-// ========================================
 function initYearUpdate() {
-    const el = document.getElementById('footerYear');
-    if (el) el.textContent = new Date().getFullYear();
+  const el = document.getElementById('footerYear');
+  if (el) el.textContent = new Date().getFullYear();
 }
 
-// ========================================
-// 12. PROJECT CARDS
-// ========================================
 function initProjectCards() {
-    document.querySelectorAll('.project-card').forEach((card, i) => {
-        card.style.transitionDelay = `${i * 0.1}s`;
-    });
+  document.querySelectorAll('.project-card').forEach((card, i) => {
+    card.style.transitionDelay = `${i * 0.1}s`;
+  });
 }
 
-// ========================================
-// 13. THEME TOGGLE
-// ========================================
 function initThemeToggle() {
-    const toggleBtn = document.getElementById('themeToggle');
-    if (!toggleBtn) return;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const savedTheme = localStorage.getItem('theme');
-    const currentTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-    document.documentElement.setAttribute('data-theme', currentTheme);
-    toggleBtn.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
-    toggleBtn.addEventListener('click', () => {
-        const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        toggleBtn.textContent = newTheme === 'dark' ? '🌙' : '☀️';
-    });
+  const btn = document.getElementById('themeToggle');
+  if (!btn) return;
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const saved = localStorage.getItem('theme');
+  const theme = saved || (prefersDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+  btn.textContent = theme === 'dark' ? '🌙' : '☀️';
+  btn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    btn.textContent = next === 'dark' ? '🌙' : '☀️';
+  });
 }
 
-// ========================================
-// 14. SKILL BARS ANIMATION
-// ========================================
 function animateSkillBars() {
-    const fills = document.querySelectorAll('.skill-bar-fill');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const fill = entry.target;
-                const width = fill.dataset.width || 0;
-                setTimeout(() => { fill.style.width = width + '%'; }, 200);
-                observer.unobserve(fill);
-            }
-        });
-    }, { threshold: 0.5 });
-    fills.forEach(fill => observer.observe(fill));
+  const fills = document.querySelectorAll('.skill-bar-fill');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const fill = e.target;
+        const w = fill.dataset.width || 0;
+        setTimeout(() => { fill.style.width = w + '%'; }, 200);
+        obs.unobserve(fill);
+      }
+    });
+  }, { threshold: 0.5 });
+  fills.forEach(fill => obs.observe(fill));
 }
 
-// ========================================
-// 15. TILT CARDS (3D HOVER)
-// ========================================
 function initTiltCards() {
-    document.querySelectorAll('.tilt-card').forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            const rotateX = ((y - centerY) / centerY) * -8;
-            const rotateY = ((x - centerX) / centerX) * 8;
-            card.style.setProperty('--rotateX', rotateX + 'deg');
-            card.style.setProperty('--rotateY', rotateY + 'deg');
-        });
-        card.addEventListener('mouseleave', () => {
-            card.style.setProperty('--rotateX', '0deg');
-            card.style.setProperty('--rotateY', '0deg');
-        });
+  document.querySelectorAll('.tilt-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      const cx = r.width / 2;
+      const cy = r.height / 2;
+      const rx = ((y - cy) / cy) * -10;
+      const ry = ((x - cx) / cx) * 10;
+      card.style.setProperty('--rotateX', rx + 'deg');
+      card.style.setProperty('--rotateY', ry + 'deg');
     });
+    card.addEventListener('mouseleave', () => {
+      card.style.setProperty('--rotateX', '0deg');
+      card.style.setProperty('--rotateY', '0deg');
+    });
+  });
 }
 
-// ========================================
-// 16. SMOOTH SCROLL
-// ========================================
+function initMobileMenu() {
+  const toggle = document.getElementById('menuToggle');
+  const menu = document.getElementById('mobileMenu');
+  const close = document.getElementById('closeMenu');
+  if (!toggle || !menu) return;
+  toggle.addEventListener('click', () => menu.classList.add('active'));
+  if (close) close.addEventListener('click', () => menu.classList.remove('active'));
+  menu.addEventListener('click', e => {
+    if (e.target.tagName === 'A') menu.classList.remove('active');
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') menu.classList.remove('active');
+  });
+}
+
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        const targetId = this.getAttribute('href');
-        if (targetId === '#') return;
-        const target = document.querySelector(targetId);
-        if (target) {
-            e.preventDefault();
-            const navHeight = document.getElementById('navbar').offsetHeight;
-            window.scrollTo({
-                top: target.offsetTop - navHeight - 20,
-                behavior: 'smooth'
-            });
-        }
-    });
+  anchor.addEventListener('click', function (e) {
+    const id = this.getAttribute('href');
+    if (id === '#') return;
+    const target = document.querySelector(id);
+    if (target) {
+      e.preventDefault();
+      const nav = document.getElementById('navbar');
+      const offset = nav ? nav.offsetHeight : 0;
+      window.scrollTo({ top: target.offsetTop - offset - 20, behavior: 'smooth' });
+    }
+  });
 });
 
-// ========================================
-// 17. CONSOLE WELCOME
-// ========================================
-console.log('%c🚀 Vishal Kumar Portfolio', 'font-size:24px;font-weight:bold;color:#6c5ce7;');
-console.log('%cBuilt with ❤️ using Vanilla JS', 'font-size:14px;color:#9090a8;');
-console.log('%cSource: https://github.com/vishal4u88', 'font-size:14px;color:#00d4ff;');
+function downloadResume() {
+  window.open('assets/resume.pdf', '_blank');
+}
+
+console.log('%c⚡ Vishal Kumar — Portfolio v3', 'font-size:22px;font-weight:800;color:#00f0ff;');
+console.log('%cTechnical Support Engineer & AI Automation @ HP', 'font-size:13px;color:#8888aa;');
+console.log('%cgithub.com/vishal4u88', 'font-size:12px;color:#b400ff;');
