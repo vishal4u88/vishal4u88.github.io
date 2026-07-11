@@ -363,7 +363,9 @@ function initProjectCards() {
 function initThemeToggle() {
     const toggleBtn = document.getElementById('themeToggle');
     if (!toggleBtn) return;
-    const currentTheme = localStorage.getItem('theme') || 'dark';
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem('theme');
+    const currentTheme = savedTheme || (prefersDark ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', currentTheme);
     toggleBtn.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
     toggleBtn.addEventListener('click', () => {

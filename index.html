@@ -24,6 +24,9 @@
     <meta name="twitter:description" content="Technical Support Engineer at HP Inc. with 3+ years experience, AI Automation, Chrome Extension Developer." />
     <meta name="twitter:image" content="https://vishal4u88.github.io/assets/images/og-image.jpg" />
     
+    <meta name="color-scheme" content="dark light" />
+    <link rel="stylesheet" href="style.css" />
+    
     <!-- Schema.org -->
     <script type="application/ld+json">
     {
@@ -355,12 +358,12 @@
     <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
         <a href="#" style="font-weight:700;font-size:1.3rem;letter-spacing:-0.02em;background:linear-gradient(135deg,#6c5ce7,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">VK</a>
         <div style="display:flex;align-items:center;gap:32px;">
-            <div style="display:flex;gap:28px;font-size:0.85rem;font-weight:500;">
-                <a href="#about" style="color:#a0a0b8;transition:color 0.3s;">About</a>
-                <a href="#skills" style="color:#a0a0b8;transition:color 0.3s;">Skills</a>
-                <a href="#projects" style="color:#a0a0b8;transition:color 0.3s;">Projects</a>
-                <a href="#experience" style="color:#a0a0b8;transition:color 0.3s;">Experience</a>
-                <a href="#contact" style="color:#a0a0b8;transition:color 0.3s;">Contact</a>
+                <div class="nav-links">
+                <a href="#about">About</a>
+                <a href="#skills">Skills</a>
+                <a href="#projects">Projects</a>
+                <a href="#experience">Experience</a>
+                <a href="#contact">Contact</a>
             </div>
             <a href="#contact" class="btn-primary" style="padding:10px 24px;font-size:0.8rem;">Let's Talk</a>
         </div>
@@ -1038,22 +1041,7 @@ function downloadResume() {
     });
 </script>
 
-<!-- ===== THEME TOGGLE ===== -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const toggleBtn = document.getElementById('themeToggle');
-    const currentTheme = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', currentTheme);
-    toggleBtn.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
 
-    toggleBtn.addEventListener('click', () => {
-        const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        toggleBtn.textContent = newTheme === 'dark' ? '🌙' : '☀️';
-    });
-});
-</script>
 
 <!-- ===== FORCE COUNTER ANIMATION ===== -->
 <script>
@@ -1163,8 +1151,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- ===== LINK TO EXTERNAL CSS & JS ===== -->
-<link rel="stylesheet" href="style.css" />
 <script src="script.js" defer></script>
 
 </body>
