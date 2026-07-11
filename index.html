@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -69,6 +69,7 @@
             color: #e8e8f0;
             overflow-x: hidden;
             line-height: 1.6;
+            transition: background 0.4s ease, color 0.4s ease;
         }
         .loader {
             position: fixed;
@@ -156,6 +157,7 @@
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 20px;
+            transition: background 0.4s ease, border-color 0.4s ease, transform 0.3s ease, box-shadow 0.3s ease;
         }
         .btn-primary {
             display: inline-flex;
@@ -230,9 +232,115 @@
             opacity: 1;
             transform: translateX(0);
         }
+        /* Gradient Glow Text */
+        .gradient-glow {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe, #00d4ff, #6c5ce7);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease-in-out infinite;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 999;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #6c5ce7, #00d4ff);
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 8px 35px rgba(108, 92, 231, 0.5);
+        }
+        .theme-toggle:active {
+            transform: scale(0.9);
+        }
+        @media (max-width: 768px) {
+            .theme-toggle {
+                width: 48px;
+                height: 48px;
+                font-size: 1.2rem;
+                bottom: 16px;
+                right: 16px;
+            }
+        }
+        /* Dynamic Background */
+        .dynamic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at 20% 50%, rgba(108, 92, 231, 0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 50%, rgba(0, 212, 255, 0.08) 0%, transparent 60%);
+            transition: opacity 0.8s ease;
+            pointer-events: none;
+        }
+        /* Skill Bars */
+        .skill-bar-group {
+            margin-bottom: 20px;
+        }
+        .skill-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #9090a8;
+        }
+        .skill-bar-track {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 50px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .skill-bar-fill {
+            height: 100%;
+            border-radius: 50px;
+            background: linear-gradient(90deg, #6c5ce7, #00d4ff);
+            width: 0%;
+            transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        /* Tilt Card */
+        .tilt-card {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+            perspective: 800px;
+        }
+        .tilt-card:hover {
+            transform: rotateX(var(--rotateX, 0deg)) rotateY(var(--rotateY, 0deg)) translateY(-8px);
+            box-shadow: 0 20px 60px rgba(108, 92, 231, 0.08);
+        }
     </style>
 </head>
 <body>
+
+<!-- ===== DYNAMIC BACKGROUND ===== -->
+<div class="dynamic-bg"></div>
+
+<!-- ===== THEME TOGGLE ===== -->
+<button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌙</button>
 
 <!-- ===== LOADER ===== -->
 <div class="loader" id="loader" role="status" aria-label="Loading">
@@ -281,7 +389,7 @@
             </div>
             <h1 style="font-size:clamp(2.8rem,7vw,5.2rem);font-weight:800;letter-spacing:-0.04em;line-height:1.05;margin-bottom:12px;">
                 <span style="color:#fff;">Vishal</span>
-                <span style="background:linear-gradient(135deg,#6c5ce7,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Kumar</span>
+                <span class="gradient-glow">Kumar</span>
             </h1>
             <div style="font-size:clamp(1.2rem,2vw,1.8rem);font-weight:500;color:#b0b0c8;margin-bottom:24px;min-height:2.2em;">
                 <span id="typingText" style="border-right:2px solid #6c5ce7;padding-right:4px;"></span>
@@ -292,7 +400,7 @@
             </p>
             <div style="display:flex;flex-wrap:wrap;gap:14px;">
                 <a href="#projects" class="btn-primary">View Projects →</a>
-                <a href="assets/resume.pdf" download class="btn-secondary">📄 Download Resume</a>
+                <a href="#" onclick="downloadResume(); return false;" class="btn-secondary">📄 Download Resume</a>
                 <a href="https://github.com/vishal4u88" target="_blank" class="btn-secondary" style="padding:14px 20px;">🐙</a>
                 <a href="https://linkedin.com/in/vishal4u88" target="_blank" class="btn-secondary" style="padding:14px 20px;">🔗</a>
             </div>
@@ -334,25 +442,25 @@
             </div>
             <div class="reveal">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                    <div class="glass" style="padding:24px;text-align:center;">
+                    <div class="glass tilt-card" style="padding:24px;text-align:center;">
                         <div style="font-size:2.8rem;font-weight:800;background:linear-gradient(135deg,#6c5ce7,#a29bfe);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
                             <span id="counterYears">0</span>+
                         </div>
                         <div style="color:#9090a8;font-size:0.9rem;">Years Experience</div>
                     </div>
-                    <div class="glass" style="padding:24px;text-align:center;">
+                    <div class="glass tilt-card" style="padding:24px;text-align:center;">
                         <div style="font-size:2.8rem;font-weight:800;background:linear-gradient(135deg,#00d4ff,#6c5ce7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
                             <span id="counterPromotions">0</span>
                         </div>
                         <div style="color:#9090a8;font-size:0.9rem;">Promotions</div>
                     </div>
-                    <div class="glass" style="padding:24px;text-align:center;">
+                    <div class="glass tilt-card" style="padding:24px;text-align:center;">
                         <div style="font-size:2.8rem;font-weight:800;background:linear-gradient(135deg,#fdcb6e,#e17055);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
                             <span id="counterReduction">0</span>%+
                         </div>
                         <div style="color:#9090a8;font-size:0.9rem;">Manual Work Reduction</div>
                     </div>
-                    <div class="glass" style="padding:24px;text-align:center;">
+                    <div class="glass tilt-card" style="padding:24px;text-align:center;">
                         <div style="font-size:2.8rem;font-weight:800;background:linear-gradient(135deg,#00b894,#00cec9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
                             <span id="counterGlobal">0</span>
                         </div>
@@ -364,67 +472,38 @@
     </div>
 </section>
 
-<!-- ===== SKILLS ===== -->
-<section id="skills" style="background:rgba(255,255,255,0.01);">
+<!-- ===== SKILLS (NEW VIBE CODING STYLE) ===== -->
+<section id="skills" style="background:var(--section-bg, rgba(255,255,255,0.01));padding:100px 0;">
     <div class="container">
         <div class="section-header center">
             <div class="section-label reveal">Expertise</div>
-            <h2 class="section-title reveal">Skills & Technologies</h2>
-            <p class="section-subtitle reveal">A blend of enterprise support expertise and modern AI/automation capabilities.</p>
+            <h2 class="section-title reveal">Technical <span class="gradient-glow">Proficiency</span></h2>
+            <p class="section-subtitle reveal">A blend of enterprise support, AI, and modern development skills.</p>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;">
-            <!-- Technical Support -->
-            <div class="glass reveal" style="padding:28px;transition:all 0.4s ease;cursor:default;" onmouseenter="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 60px rgba(108,92,231,0.15)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-                <div style="font-size:1.8rem;margin-bottom:12px;">🛠️</div>
-                <h3 style="font-size:1rem;font-weight:600;margin-bottom:12px;color:#fff;">Technical Support</h3>
-                <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Windows</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Networking</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Hardware</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Remote Diagnostics</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Active Directory</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Microsoft 365</span>
-                </div>
+        <div style="max-width:700px;margin:0 auto;">
+            <div class="skill-bar-group reveal">
+                <div class="skill-bar-label"><span>Technical Support & Diagnostics</span><span>95%</span></div>
+                <div class="skill-bar-track"><div class="skill-bar-fill" data-width="95"></div></div>
             </div>
-            <!-- Automation -->
-            <div class="glass reveal" style="padding:28px;transition:all 0.4s ease;cursor:default;" onmouseenter="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 60px rgba(0,212,255,0.15)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-                <div style="font-size:1.8rem;margin-bottom:12px;">⚡</div>
-                <h3 style="font-size:1rem;font-weight:600;margin-bottom:12px;color:#fff;">Automation</h3>
-                <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">JavaScript</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Python</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">FastAPI</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">REST API</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Chrome Extensions</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Git</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">GitHub</span>
-                </div>
+            <div class="skill-bar-group reveal">
+                <div class="skill-bar-label"><span>Python & Automation (FastAPI, Pandas)</span><span>90%</span></div>
+                <div class="skill-bar-track"><div class="skill-bar-fill" data-width="90"></div></div>
             </div>
-            <!-- AI -->
-            <div class="glass reveal" style="padding:28px;transition:all 0.4s ease;cursor:default;" onmouseenter="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 60px rgba(162,155,254,0.15)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-                <div style="font-size:1.8rem;margin-bottom:12px;">🧠</div>
-                <h3 style="font-size:1rem;font-weight:600;margin-bottom:12px;color:#fff;">Artificial Intelligence</h3>
-                <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Llama</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Ollama</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Prompt Engineering</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Whisper</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">LLMs</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Generative AI</span>
-                </div>
+            <div class="skill-bar-group reveal">
+                <div class="skill-bar-label"><span>AI & LLMs (Ollama, Llama, Whisper)</span><span>88%</span></div>
+                <div class="skill-bar-track"><div class="skill-bar-fill" data-width="88"></div></div>
             </div>
-            <!-- Data Analytics -->
-            <div class="glass reveal" style="padding:28px;transition:all 0.4s ease;cursor:default;" onmouseenter="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 60px rgba(0,184,148,0.15)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-                <div style="font-size:1.8rem;margin-bottom:12px;">📊</div>
-                <h3 style="font-size:1rem;font-weight:600;margin-bottom:12px;color:#fff;">Data Analytics</h3>
-                <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">SQL</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Power BI</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Tableau</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Pandas</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Scikit-learn</span>
-                    <span style="background:rgba(255,255,255,0.06);padding:4px 14px;border-radius:50px;font-size:0.75rem;color:#c0c0d8;">Snowflake</span>
-                </div>
+            <div class="skill-bar-group reveal">
+                <div class="skill-bar-label"><span>Data Analytics (SQL, Power BI, Tableau)</span><span>82%</span></div>
+                <div class="skill-bar-track"><div class="skill-bar-fill" data-width="82"></div></div>
+            </div>
+            <div class="skill-bar-group reveal">
+                <div class="skill-bar-label"><span>Web & Chrome Extensions (JS, REST)</span><span>85%</span></div>
+                <div class="skill-bar-track"><div class="skill-bar-fill" data-width="85"></div></div>
+            </div>
+            <div class="skill-bar-group reveal">
+                <div class="skill-bar-label"><span>DevOps & Cloud (Git, Docker, AWS)</span><span>75%</span></div>
+                <div class="skill-bar-track"><div class="skill-bar-fill" data-width="75"></div></div>
             </div>
         </div>
     </div>
@@ -435,12 +514,12 @@
     <div class="container">
         <div class="section-header">
             <div class="section-label reveal">Portfolio</div>
-            <h2 class="section-title reveal">Featured Projects</h2>
+            <h2 class="section-title reveal">Featured <span class="gradient-glow">Projects</span></h2>
             <p class="section-subtitle reveal">AI-powered tools built for real-world enterprise impact.</p>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:28px;">
             <!-- Project 1 -->
-            <div class="glass reveal" style="overflow:hidden;transition:all 0.5s ease;cursor:default;" onmouseenter="this.style.transform='translateY(-12px)';this.style.boxShadow='0 30px 80px rgba(108,92,231,0.12)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
+            <div class="glass tilt-card reveal" style="overflow:hidden;transition:all 0.5s ease;cursor:default;">
                 <div style="height:200px;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-size:3rem;color:#6c5ce7;border-bottom:1px solid rgba(255,255,255,0.05);">
                     🤖
                 </div>
@@ -462,7 +541,7 @@
                 </div>
             </div>
             <!-- Project 2 -->
-            <div class="glass reveal" style="overflow:hidden;transition:all 0.5s ease;cursor:default;" onmouseenter="this.style.transform='translateY(-12px)';this.style.boxShadow='0 30px 80px rgba(0,212,255,0.12)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
+            <div class="glass tilt-card reveal" style="overflow:hidden;transition:all 0.5s ease;cursor:default;">
                 <div style="height:200px;background:linear-gradient(135deg,#0d1b2a,#1b2838);display:flex;align-items:center;justify-content:center;font-size:3rem;color:#00d4ff;border-bottom:1px solid rgba(255,255,255,0.05);">
                     🎙️
                 </div>
@@ -485,7 +564,7 @@
                 </div>
             </div>
             <!-- Project 3 -->
-            <div class="glass reveal" style="overflow:hidden;transition:all 0.5s ease;cursor:default;" onmouseenter="this.style.transform='translateY(-12px)';this.style.boxShadow='0 30px 80px rgba(253,203,110,0.12)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
+            <div class="glass tilt-card reveal" style="overflow:hidden;transition:all 0.5s ease;cursor:default;">
                 <div style="height:200px;background:linear-gradient(135deg,#1a1a2e,#2d1b2e);display:flex;align-items:center;justify-content:center;font-size:3rem;color:#fdcb6e;border-bottom:1px solid rgba(255,255,255,0.05);">
                     📈
                 </div>
@@ -515,7 +594,7 @@
     <div class="container">
         <div class="section-header center">
             <div class="section-label reveal">Career</div>
-            <h2 class="section-title reveal">Professional Experience</h2>
+            <h2 class="section-title reveal">Professional <span class="gradient-glow">Journey</span></h2>
             <p class="section-subtitle reveal">Three promotions in 3+ years at HP Inc.</p>
         </div>
         <div style="position:relative;padding-left:40px;border-left:2px solid rgba(108,92,231,0.3);max-width:800px;margin:0 auto;">
@@ -570,17 +649,17 @@
     <div class="container">
         <div class="section-header center">
             <div class="section-label reveal">Learning</div>
-            <h2 class="section-title reveal">Certifications & Education</h2>
+            <h2 class="section-title reveal">Certifications & <span class="gradient-glow">Education</span></h2>
             <p class="section-subtitle reveal">Continuous learning and professional development.</p>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;">
-            <div class="glass reveal" style="padding:28px;text-align:center;">
+            <div class="glass tilt-card reveal" style="padding:28px;text-align:center;">
                 <div style="font-size:2.5rem;margin-bottom:12px;">📊</div>
                 <h3 style="font-size:1rem;font-weight:600;color:#fff;margin-bottom:6px;">Master Data Analysis</h3>
                 <p style="color:#9090a8;font-size:0.85rem;">Python · SQL · Power BI · Tableau · Snowflake · AWS</p>
                 <span style="display:inline-block;margin-top:12px;font-size:0.7rem;color:#6c5ce7;background:rgba(108,92,231,0.12);padding:4px 16px;border-radius:50px;">In Progress</span>
             </div>
-            <div class="glass reveal" style="padding:28px;text-align:center;opacity:0.5;">
+            <div class="glass tilt-card reveal" style="padding:28px;text-align:center;opacity:0.5;">
                 <div style="font-size:2.5rem;margin-bottom:12px;">🎓</div>
                 <h3 style="font-size:1rem;font-weight:600;color:#fff;margin-bottom:6px;">More Certifications</h3>
                 <p style="color:#9090a8;font-size:0.85rem;">Coming soon</p>
@@ -594,12 +673,12 @@
     <div class="container">
         <div class="section-header center">
             <div class="section-label reveal">Open Source</div>
-            <h2 class="section-title reveal">GitHub Activity</h2>
+            <h2 class="section-title reveal">GitHub <span class="gradient-glow">Activity</span></h2>
             <p class="section-subtitle reveal">Automatically fetched from my GitHub profile.</p>
         </div>
         <div id="githubContent" style="display:grid;grid-template-columns:1fr 2fr;gap:30px;">
             <!-- Left: Profile -->
-            <div class="glass reveal" style="padding:28px;text-align:center;">
+            <div class="glass tilt-card reveal" style="padding:28px;text-align:center;">
                 <div id="githubAvatar" style="width:100px;height:100px;border-radius:50%;margin:0 auto 16px;background:linear-gradient(135deg,#6c5ce7,#00d4ff);padding:3px;">
                     <img src="" alt="GitHub Avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />
                 </div>
@@ -613,7 +692,7 @@
                 <a href="https://github.com/vishal4u88" target="_blank" class="btn-secondary" style="padding:10px 28px;font-size:0.85rem;">View Profile →</a>
             </div>
             <!-- Right: Repos -->
-            <div class="glass reveal" style="padding:28px;">
+            <div class="glass tilt-card reveal" style="padding:28px;">
                 <h4 style="font-size:0.9rem;font-weight:600;color:#fff;margin-bottom:16px;">📁 Latest Repositories</h4>
                 <div id="githubReposList" style="display:flex;flex-direction:column;gap:12px;">
                     <p style="color:#606078;font-size:0.9rem;">Loading repositories...</p>
@@ -632,7 +711,7 @@
     <div class="container">
         <div class="section-header center">
             <div class="section-label reveal">Toolbox</div>
-            <h2 class="section-title reveal">Tech Stack</h2>
+            <h2 class="section-title reveal">Tech <span class="gradient-glow">Stack</span></h2>
         </div>
         <div id="techIcons" style="display:flex;flex-wrap:wrap;justify-content:center;gap:30px;padding:20px 0;">
             <span style="font-size:2.5rem;filter:grayscale(0.2);transition:all 0.3s;" onmouseenter="this.style.transform='translateY(-8px) scale(1.1)';this.style.filter='grayscale(0)'" onmouseleave="this.style.transform='';this.style.filter='grayscale(0.2)'">🐍</span>
@@ -652,10 +731,10 @@
     <div class="container">
         <div class="section-header center">
             <div class="section-label reveal">Connect</div>
-            <h2 class="section-title reveal">Let's Talk</h2>
+            <h2 class="section-title reveal">Let's <span class="gradient-glow">Talk</span></h2>
             <p class="section-subtitle reveal">Have a project in mind? I'd love to hear about it.</p>
         </div>
-        <div class="glass reveal" style="max-width:600px;margin:0 auto;padding:48px;">
+        <div class="glass tilt-card reveal" style="max-width:600px;margin:0 auto;padding:48px;">
             <form id="contactForm" style="display:flex;flex-direction:column;gap:20px;">
                 <div>
                     <label for="contactName" style="display:block;font-size:0.85rem;font-weight:500;color:#c0c0d8;margin-bottom:6px;">Name</label>
@@ -779,6 +858,107 @@
         color: #fff;
         cursor: pointer;
     }
+    /* Light mode overrides for critical elements */
+    [data-theme="light"] body {
+        background: #f5f3ff;
+        color: #1a1a2e;
+    }
+    [data-theme="light"] .glass {
+        background: rgba(0,0,0,0.04);
+        border-color: rgba(0,0,0,0.08);
+    }
+    [data-theme="light"] .btn-secondary {
+        color: #1a1a2e;
+        border-color: rgba(0,0,0,0.1);
+    }
+    [data-theme="light"] .btn-secondary:hover {
+        background: rgba(0,0,0,0.08);
+    }
+    [data-theme="light"] #navbar {
+        background: rgba(245,243,255,0.85);
+        border-bottom-color: rgba(0,0,0,0.06);
+    }
+    [data-theme="light"] #navbar .nav-links a {
+        color: #4a4a6a;
+    }
+    [data-theme="light"] #navbar .nav-links a:hover {
+        color: #1a1a2e;
+    }
+    [data-theme="light"] #skills,
+    [data-theme="light"] #experience,
+    [data-theme="light"] #github-section,
+    [data-theme="light"] #contact {
+        background: rgba(0,0,0,0.02);
+    }
+    [data-theme="light"] .skill-bar-track {
+        background: rgba(0,0,0,0.06);
+        border-color: rgba(0,0,0,0.08);
+    }
+    [data-theme="light"] .dynamic-bg {
+        opacity: 0.5;
+    }
+    [data-theme="light"] .section-title {
+        background: linear-gradient(135deg, #1a1a2e 0%, #4a4a6a 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    [data-theme="light"] .section-subtitle,
+    [data-theme="light"] #hero .hero-description,
+    [data-theme="light"] #about .about-text {
+        color: #4a4a6a;
+    }
+    [data-theme="light"] #hero h1 span:first-child {
+        color: #1a1a2e;
+    }
+    [data-theme="light"] #hero .typing-container {
+        color: #4a4a6a;
+    }
+    [data-theme="light"] .stat-label,
+    [data-theme="light"] .skill-bar-label {
+        color: #4a4a6a;
+    }
+    [data-theme="light"] .project-description,
+    [data-theme="light"] #about p {
+        color: #4a4a6a;
+    }
+    [data-theme="light"] .project-header h3,
+    [data-theme="light"] .timeline-header h3,
+    [data-theme="light"] .cert-card h3,
+    [data-theme="light"] #github-section .github-profile h3,
+    [data-theme="light"] #github-section .github-repos h4,
+    [data-theme="light"] #contact .contact-card label {
+        color: #1a1a2e;
+    }
+    [data-theme="light"] #experience .timeline-details,
+    [data-theme="light"] #experience .timeline-details li {
+        color: #4a4a6a;
+    }
+    [data-theme="light"] footer {
+        border-top-color: rgba(0,0,0,0.06);
+    }
+    [data-theme="light"] footer .footer-copyright {
+        color: #8a8aaa;
+    }
+    [data-theme="light"] #contact .contact-card input,
+    [data-theme="light"] #contact .contact-card textarea {
+        color: #1a1a2e;
+        background: rgba(0,0,0,0.04);
+        border-color: rgba(0,0,0,0.08);
+    }
+    [data-theme="light"] #contact .contact-card input::placeholder,
+    [data-theme="light"] #contact .contact-card textarea::placeholder {
+        color: #8a8aaa;
+    }
+    [data-theme="light"] #mobileMenu {
+        background: rgba(245,243,255,0.97);
+    }
+    [data-theme="light"] #mobileMenu a {
+        color: #1a1a2e;
+    }
+    [data-theme="light"] #mobileMenu a:hover {
+        color: #6c5ce7;
+    }
 </style>
 
 <!-- Mobile Menu -->
@@ -792,31 +972,195 @@
     <a href="#contact" class="btn-primary" onclick="closeMobileMenu()">Let's Talk</a>
 </div>
 
+<!-- ===== RESUME DOWNLOAD FUNCTION ===== -->
 <script>
-    // Mobile menu toggle
+function downloadResume() {
+    const link = document.createElement('a');
+    link.href = 'assets/resume.pdf';
+    link.download = 'Vishal_Kumar_Resume.pdf';
+    
+    fetch('assets/resume.pdf')
+        .then(response => {
+            if (!response.ok) throw new Error('Resume not found');
+            return response.blob();
+        })
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        })
+        .catch(() => {
+            alert('📄 Resume not found!\n\nPlease upload your resume as "assets/resume.pdf"\n\nFor now, you can view my LinkedIn profile:');
+            window.open('https://linkedin.com/in/vishal4u88', '_blank');
+        });
+}
+</script>
+
+<!-- ===== MOBILE MENU SCRIPT ===== -->
+<script>
     const menuToggle = document.getElementById('menuToggle');
     const mobileMenu = document.getElementById('mobileMenu');
     const closeMenu = document.getElementById('closeMenu');
     
-    menuToggle.addEventListener('click', () => {
-        mobileMenu.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    });
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+    }
     
     function closeMobileMenu() {
         mobileMenu.style.display = 'none';
         document.body.style.overflow = '';
     }
     
-    closeMenu.addEventListener('click', closeMobileMenu);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMobileMenu(); });
+    if (closeMenu) {
+        closeMenu.addEventListener('click', closeMobileMenu);
+    }
+    
+    document.addEventListener('keydown', (e) => { 
+        if (e.key === 'Escape') closeMobileMenu(); 
+    });
 </script>
 
 <!-- ===== LOADER HIDE ===== -->
 <script>
     window.addEventListener('load', () => {
-        document.getElementById('loader').classList.add('hidden');
+        const loader = document.getElementById('loader');
+        if (loader) {
+            setTimeout(() => {
+                loader.classList.add('hidden');
+            }, 500);
+        }
     });
+</script>
+
+<!-- ===== THEME TOGGLE ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('themeToggle');
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    toggleBtn.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
+
+    toggleBtn.addEventListener('click', () => {
+        const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        toggleBtn.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+    });
+});
+</script>
+
+<!-- ===== FORCE COUNTER ANIMATION ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const counterElements = [
+        { id: 'counterYears', target: 3, suffix: '+' },
+        { id: 'counterPromotions', target: 3, suffix: '' },
+        { id: 'counterReduction', target: 70, suffix: '%+' },
+        { id: 'counterGlobal', target: 3, suffix: '' }
+    ];
+    
+    function animateCounterElement(el, target, suffix) {
+        let current = 0;
+        const duration = 1500;
+        const startTime = performance.now();
+        
+        function updateCounter(time) {
+            const elapsed = time - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            current = Math.floor(eased * target);
+            el.textContent = current + suffix;
+            
+            if (progress < 1) {
+                requestAnimationFrame(updateCounter);
+            } else {
+                el.textContent = target + suffix;
+            }
+        }
+        
+        setTimeout(() => {
+            requestAnimationFrame(updateCounter);
+        }, 500);
+    }
+    
+    function checkAndAnimateCounters() {
+        counterElements.forEach(function(counter) {
+            const el = document.getElementById(counter.id);
+            if (!el) return;
+            
+            const rect = el.getBoundingClientRect();
+            const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+            
+            if (isVisible && !el.dataset.animated) {
+                el.dataset.animated = 'true';
+                animateCounterElement(el, counter.target, counter.suffix);
+            }
+        });
+    }
+    
+    setTimeout(checkAndAnimateCounters, 1000);
+    window.addEventListener('scroll', checkAndAnimateCounters);
+    
+    let attempts = 0;
+    const interval = setInterval(function() {
+        attempts++;
+        checkAndAnimateCounters();
+        if (attempts > 10) clearInterval(interval);
+    }, 2000);
+});
+</script>
+
+<!-- ===== SKILL BAR ANIMATION ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function animateSkillBars() {
+        const fills = document.querySelectorAll('.skill-bar-fill');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const fill = entry.target;
+                    const width = fill.dataset.width || 0;
+                    setTimeout(() => {
+                        fill.style.width = width + '%';
+                    }, 200);
+                    observer.unobserve(fill);
+                }
+            });
+        }, { threshold: 0.5 });
+        fills.forEach(fill => observer.observe(fill));
+    }
+    animateSkillBars();
+});
+</script>
+
+<!-- ===== TILT CARD EFFECT ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.tilt-card');
+    cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -8;
+            const rotateY = ((x - centerX) / centerX) * 8;
+            card.style.setProperty('--rotateX', rotateX + 'deg');
+            card.style.setProperty('--rotateY', rotateY + 'deg');
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.setProperty('--rotateX', '0deg');
+            card.style.setProperty('--rotateY', '0deg');
+        });
+    });
+});
 </script>
 
 <!-- ===== LINK TO EXTERNAL CSS & JS ===== -->
